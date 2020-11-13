@@ -286,6 +286,7 @@ module Fluent::Plugin
         if (pod_metadata.include? 'containers') && (pod_metadata['containers'].include? container_id) && !@skip_container_metadata
           metadata['kubernetes']['container_image'] = pod_metadata['containers'][container_id]['image']
           metadata['kubernetes']['container_image_id'] = pod_metadata['containers'][container_id]['image_id']
+          metadata['kubernetes']['container_env'] = pod_metadata['containers'][container_id]['env']
         end
 
         metadata['kubernetes'].merge!(pod_metadata) if pod_metadata

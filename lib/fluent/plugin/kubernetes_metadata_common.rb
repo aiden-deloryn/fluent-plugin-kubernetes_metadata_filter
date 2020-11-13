@@ -75,8 +75,13 @@ module KubernetesMetadata
             container_meta[container_id] = {
                 'name' => container_status[:name],
                 'image' => container_status[:image],
-                'image_id' => container_status[:imageID]
+                'image_id' => container_status[:imageID],
+                'env' => Hash.new
             }
+            env_vars = get_container_env_vars(pod_object, container_meta[container_id]['name'])
+            env_vars.each do|env_var|
+              container_meta[container_id]['env'][env_var[:name]] = env_var[:value]
+            end
           else
             container_meta[container_id] = {
                 'name' => container_status[:name]
@@ -98,6 +103,14 @@ module KubernetesMetadata
       kubernetes_metadata['labels'] = labels unless labels.empty?
       kubernetes_metadata['master_url'] = @kubernetes_url unless @skip_master_url
       kubernetes_metadata
+    end
+
+    def get_container_env_vars(pod_object, container_name)
+      pod_object[:spec][:containers].each do|container|
+        if container[:name] == container_name
+          return container[:env]
+        end
+      end
     end
 
     def syms_to_strs(hsh)
